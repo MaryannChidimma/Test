@@ -5,11 +5,11 @@ import axios from "axios";
 dotenv.config();
 
 export interface S3Config {
-  s3Endpoint: "http://localhost:9000";
-  s3Region: "us-east-1";
-  bucket: "dummy-bucket";
-  accessKeyId: "dummy-user";
-  secretAccessKey: "dummy-password";
+  s3Endpoint: string;
+  s3Region: string;
+  bucket: string;
+  accessKeyId: string;
+  secretAccessKey: string;
 }
 
 class Media {
@@ -54,15 +54,13 @@ class Media {
 
     const contentType =
       response.headers["content-type"] || "application/octet-stream";
-    console.log({ contentType });
 
     const sizeHeader = response.headers["content-length"];
     const size = parseInt(
       Array.isArray(sizeHeader) ? sizeHeader[0] : sizeHeader ?? "0",
       10
     );
- console.log({size})
- console.log({maxFileSize})
+
     if (!size || isNaN(size)) return { error: "Missing file size" };
     if (size > maxFileSize) return { error: "File too large" };
 
@@ -81,9 +79,6 @@ class Media {
         partSize: 1024 * 1024 * 5,
         leavePartsOnError: false,
       });
-
-      // parallelUploads3.on("httpUploadProgress", (progress) => {});
-
       const result = await parallelUploads3.done();
       return { data: result.Location };
     } catch (e) {
@@ -109,8 +104,8 @@ const main = async () => {
   const media = new Media(cfg);
   const upload = await media.uploadFromUrl({
     sourceUrl:
-      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    destinationDir: "uploads/image",
+      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=5020&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    destinationDir: "uploads",
     maxFileSize: 150 * 1024 * 1024,
   });
   console.log({ upload });
