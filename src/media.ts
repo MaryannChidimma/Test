@@ -108,8 +108,7 @@ const main = async () => {
     destinationDir: "uploads",
     maxFileSize: 150 * 1024 * 1024,
   });
-  console.log({ upload });
-  console.log("Okay ohh, Got here");
+ console.log({upload})
 };
 
 main();
