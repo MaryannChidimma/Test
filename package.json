@@ -1,0 +1,40 @@
+{
+  "name": "javascript-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20.15",
+    "pnpm": "9.x"
+  },
+  "scripts": {
+    "test": "vitest --run src",
+    "test:watch": "vitest src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev": "nodemon dist/media.js",
+    "start": "pnpm build && pnpm dev",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-lite/s3-types": "^0.2.6",
+    "@types/node": "^22.13.1",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@aws-lite/s3": "^0.2.6",
+    "@aws-sdk/client-s3": "^3.744.0",
+    "@aws-sdk/lib-storage": "^3.744.0",
+    "aws-sdk": "^2.1692.0",
+    "aws4": "^1.13.2",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "undici": "^7.3.0",
+    "vitest": "^3.0.5"
+  }
+}

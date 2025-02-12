@@ -1,0 +1,54 @@
+// {
+//   "compilerOptions": {
+//     "target": "ES6",
+//     "module": "CommonJS",
+//     "strict": true,
+//     "outDir": "./dist",
+//     "rootDir": "./src",
+//     "esModuleInterop": true,
+//     "resolveJsonModule": true
+//   }
+// }
+
+// {
+//   "compilerOptions": {
+//     "moduleResolution": "nodenext",
+//     "module": "NodeNext",
+//     "target": "ES2022",
+//     "strict": true,
+//     "outDir": "./dist",
+//     "rootDir": "./src",
+//     "esModuleInterop": true,
+//     "resolveJsonModule": true,
+//     "skipLibCheck": true
+//   }
+// }
+{
+  "compilerOptions": {
+    "module": "NodeNext", // Use "ESNext" or "ES2022" for ES Modules
+    "moduleResolution": "NodeNext", // Use "NodeNext" for Node.js compatibility
+    "target": "ES2022", // Set your target JavaScript version
+    "outDir": "./dist", // Output directory for compiled files
+    "rootDir": "./src", // Source directory for TypeScript files
+    "esModuleInterop": true, // Enable ES Module interop
+    "resolveJsonModule": true,
+    "strict": true // Enable strict type-checking
+  },
+  "include": ["src/**/*"],// Include all files in the src directory
+  "exclude": ["dist", "node_modules"]
+}
+
+// {
+//   "compilerOptions": {
+//     "target": "ES2020",
+//     "module": "CommonJS",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "outDir": "./dist",
+//     "rootDir": "./src"
+//   },
+//   "include": ["src/**/*"],
+//   "exclude": ["node_modules"]
+// }
