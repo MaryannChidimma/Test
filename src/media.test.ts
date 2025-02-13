@@ -20,22 +20,21 @@ describe("Media Uploads", () => {
       sourceUrl: fixtures["2mb_image"],
       destinationDir: "images",
       maxFileSize: 10 * 1000 * 1000,
-    }
+    };
     const result = await media.uploadUrl(data);
     expect(result).toEqual({
-      data: `${media.endpointURL}/${media.bucket}/${data.destinationDir}/${media.key}`,
+      data: `${media.endpointURL}/${media.bucket}/${data.destinationDir}/${media.key}.jpeg`,
     });
   });
 
   it("rejects oversized files", async () => {
-    
-     const result = await media.uploadUrl({
-        sourceUrl: fixtures["150mb_video"],
-        destinationDir: "uploads/large.jpg",
-        maxFileSize: 10 * 1000 * 1000,
-      })
+    const result = await media.uploadUrl({
+      sourceUrl: fixtures["150mb_video"],
+      destinationDir: "uploads/large.jpg",
+      maxFileSize: 10 * 1000 * 1000,
+    });
 
-    expect(result).toEqual({error: "File too large"})
+    expect(result).toEqual({ error: "File too large" });
   });
 
   it("rejects invalid file types", async () => {
@@ -44,7 +43,7 @@ describe("Media Uploads", () => {
       destinationDir: "/upload/invalid_image",
       maxFileSize: 10 * 1000 * 1000,
     });
-    expect(result).toEqual({error:"Invalid file type"});
+    expect(result).toEqual({ error: "Invalid file type" });
   });
 
   it("handles bad URLs", async () => {
@@ -53,6 +52,6 @@ describe("Media Uploads", () => {
       destinationDir: "uploads/notfound.jpg",
       maxFileSize: 10 * 1000 * 1000,
     });
-    expect(result).toEqual({error: "Invalid file type"});
+    expect(result).toEqual({ error: "Invalid file type" });
   });
 });
