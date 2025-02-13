@@ -1,17 +1,9 @@
 # Test
-
-A well-structured and efficient project built with modern tools and technologies. This project is designed to be easy to set up, run, and test. Below are the instructions to get started.
-
+ This project handles media upload
 ---
 
-## Table of Contents
+## To Get Started
 
-1. [Installation](#installation)
-2. [Running the Project](#running-the-project)
-   - [Using pnpm](#using-pnpm)
-   - [Using Docker](#using-docker)
-3. [Testing](#testing)
-4. [Configuration](#configuration)
 
 
 Before you begin, ensure you have the following installed:
@@ -26,6 +18,9 @@ Before you begin, ensure you have the following installed:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/your-username/Test.git
+   cd Test
+2. Run pnpm install
+3. Run docker compose up
+4. Run pnpm start
 
