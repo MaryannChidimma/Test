@@ -31,10 +31,62 @@ class Media {
     });
     this.endpointURL = cfg.s3Endpoint;
     this.bucket = cfg.bucket;
-    this.key = Math.random().toString(36).slice(2, 8);
+    this.key = `test${Math.random().toString(36).slice(2, 8)}`;
+  }
+  private readonly mimeToExtension: { [key: string]: string } = {
+    "image/jpeg": "jpeg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "video/mp4": "mp4",
+    "video/quicktime": "mov",
+    "application/pdf": "pdf",
+  };
+  private isAllowed(contentType: string): boolean {
+    return ["image/jpeg", "image/png", "image/gif", "video/mp4"].includes(
+      contentType ?? ""
+    );
   }
 
-  async uploadUrl({
+  private getFileExtension(contentType: string): string {
+    return this.mimeToExtension[contentType] || "bin";
+  }
+
+  private async getFileMetadata(response: any) {
+    const contentType =
+      response.headers["content-type"] || "application/octet-stream";
+    const sizeHeader = response.headers["content-length"];
+    const size = parseInt(
+      Array.isArray(sizeHeader) ? sizeHeader[0] : sizeHeader ?? "0",
+      10
+    );
+
+    return { contentType, size };
+  }
+
+  private async uploadToS3(
+    chunk: any,
+    destinationDir: string,
+    key: string,
+    extension: string
+  ) {
+    const formattedKey = `${destinationDir}/${key}.${extension}`;
+    const parallelUploads3 = new Upload({
+      client: this.s3,
+      params: {
+        Bucket: this.bucket,
+        Key: formattedKey,
+        Body: chunk,
+      },
+      tags: [],
+      queueSize: 4,
+      partSize: 1024 * 1024 * 5,
+      leavePartsOnError: false,
+    });
+
+    return await parallelUploads3.done();
+  }
+
+  public async uploadUrl({
     sourceUrl,
     destinationDir,
     maxFileSize,
@@ -43,70 +95,34 @@ class Media {
     destinationDir: string;
     maxFileSize: number;
   }) {
-    let response;
-    response = await request(sourceUrl);
-    const contentType =
-      response.headers["content-type"] || "application/octet-stream";
+    try {
+      const response = await request(sourceUrl);
+      const { contentType, size } = await this.getFileMetadata(response);
 
-    const sizeHeader = response.headers["content-length"];
-    const size = parseInt(
-      Array.isArray(sizeHeader) ? sizeHeader[0] : sizeHeader ?? "0",
-      10
-    );
-
-    if (!size || isNaN(size)) return { error: "Missing file size" };
-    if (size > maxFileSize) return { error: "File too large" };
-
-    if (!this.isAllowed(contentType as string))
-      return { error: "Invalid file type" };
-
-    for await (const chunk of response.body) {
-      try {
-        const parallelUploads3 = new Upload({
-          client: this.s3,
-          params: {
-            Bucket: `${this.bucket}`,
-            Key: `${destinationDir}/${this.key}`,
-            Body: chunk,
-          },
-          tags: [],
-          queueSize: 4,
-          partSize: 1024 * 1024 * 5,
-          leavePartsOnError: false,
-        });
-        const result = await parallelUploads3.done();
-        return { data: result.Location };
-      } catch (e) {
-        console.log({ error: e });
+      if (!size || isNaN(size)) {
+        return { error: "Missing file size" };
       }
-    }
-  }
 
-  private isAllowed(type?: string): boolean {
-    return ["image/jpeg", "image/png", "image/gif", "video/mp4"].includes(
-      type ?? ""
-    );
+      if (size > maxFileSize) {
+        return { error: "File too large" };
+      }
+
+      if (!this.isAllowed(contentType)) {
+        return { error: "Invalid file type" };
+      }
+      const extension = this.getFileExtension(contentType);
+      const result = await this.uploadToS3(
+        response.body,
+        destinationDir,
+        this.key,
+        extension
+      );
+      return { data: result.Location };
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      return { error: "Failed to upload file" };
+    }
   }
 }
 
-//use it here
-const main = async () => {
-  const cfg: S3Config = {
-    s3Endpoint: "http://localhost:9000",
-    accessKeyId: "dummy-user",
-    secretAccessKey: "dummy-password",
-    s3Region: "us-east-1",
-    bucket: "dummy-bucket",
-  };
-  const media = new Media(cfg);
-  const upload = await media.uploadUrl({
-    sourceUrl:
-      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=5020&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    destinationDir: "images",
-    maxFileSize: 150 * 1024 * 1024,
-  });
-  console.log({ upload });
-};
-
-main();
 export default Media;
